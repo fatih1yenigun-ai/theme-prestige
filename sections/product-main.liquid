@@ -1,130 +1,284 @@
 {%- assign product = product -%}
 {%- assign current_variant = product.selected_or_first_available_variant -%}
 
-<section class="product-section">
-  <div class="container">
-    <div class="product-grid">
-      <!-- Product Images -->
-      <div class="product-images">
-        <img
-          class="product-main-image"
-          src="{{ product.featured_image | image_url: width: 800 }}"
-          alt="{{ product.featured_image.alt | escape }}"
-          id="ProductMainImage"
-          width="800"
-          height="800"
-          loading="eager"
-        >
-        <div class="product-thumbnails">
-          {% for image in product.images %}
+{%- style -%}
+  .product-main-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }};
+    --padding-bottom: {{ section.settings.padding_bottom }};
+  }
+{%- endstyle -%}
+
+<section class="product-main product-main-{{ section.id }} section-padding color-{{ section.settings.color_scheme }}" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="product-main__grid" style="display: grid; grid-template-columns: {{ section.settings.media_width }}% 1fr; gap: {{ section.settings.grid_gap }}px; align-items: start;">
+
+      <!-- ===== MEDIA COLUMN ===== -->
+      <div class="product-main__media {% if section.settings.enable_sticky_media %}product-main__media--sticky{% endif %}" style="{% if section.settings.enable_sticky_media %}position: sticky; top: 80px;{% endif %}">
+        {%- if product.featured_media -%}
+          <div class="product-main__featured-media media" id="ProductMainImage-{{ section.id }}">
             <img
-              class="product-thumbnail{% if forloop.first %} active{% endif %}"
-              src="{{ image | image_url: width: 150 }}"
-              alt="{{ image.alt | escape }}"
-              width="72"
-              height="72"
-              loading="lazy"
-              onclick="document.getElementById('ProductMainImage').src='{{ image | image_url: width: 800 }}'; document.querySelectorAll('.product-thumbnail').forEach(t=>t.classList.remove('active')); this.classList.add('active');"
+              src="{{ product.featured_media | image_url: width: 1000 }}"
+              alt="{{ product.featured_media.alt | escape }}"
+              width="1000"
+              height="{{ 1000 | divided_by: product.featured_media.aspect_ratio | round }}"
+              loading="eager"
+              style="width: 100%; height: auto; border-radius: var(--media-radius);"
             >
-          {% endfor %}
-        </div>
+          </div>
+
+          {%- if product.media.size > 1 -%}
+            <div class="product-main__thumbnails" style="display: flex; gap: {{ section.settings.thumbnail_gap }}px; margin-top: {{ section.settings.thumbnail_gap }}px; overflow-x: auto;">
+              {%- for media in product.media -%}
+                <button
+                  class="product-main__thumbnail{% if forloop.first %} product-main__thumbnail--active{% endif %}"
+                  style="width: {{ section.settings.thumbnail_size }}px; height: {{ section.settings.thumbnail_size }}px; flex-shrink: 0; border: 2px solid {% if forloop.first %}rgb(var(--color-accent-1)){% else %}transparent{% endif %}; border-radius: calc(var(--media-radius) / 2); overflow: hidden; cursor: pointer; padding: 0; background: none;"
+                  data-media-id="{{ media.id }}"
+                  aria-label="{{ media.alt | escape | default: product.title }}"
+                >
+                  <img
+                    src="{{ media | image_url: width: 200 }}"
+                    alt="{{ media.alt | escape }}"
+                    width="{{ section.settings.thumbnail_size }}"
+                    height="{{ section.settings.thumbnail_size }}"
+                    loading="lazy"
+                    style="width: 100%; height: 100%; object-fit: cover;"
+                  >
+                </button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          <div class="product-main__no-media media" style="aspect-ratio: 1; background: rgba(var(--color-foreground), 0.05); display: flex; align-items: center; justify-content: center;">
+            <span class="text-muted">{{ product.title | escape }}</span>
+          </div>
+        {%- endif -%}
       </div>
 
-      <!-- Product Info -->
-      <div class="product-info">
-        <h1 class="product-title">{{ product.title }}</h1>
+      <!-- ===== INFO COLUMN ===== -->
+      <div class="product-main__info">
+        {%- for block in section.blocks -%}
+          <div class="product-main__block product-main__block--{{ block.type }}" style="margin-top: {{ block.settings.margin_top | default: 0 | divided_by: 10.0 }}rem; margin-bottom: {{ block.settings.margin_bottom | default: 0 | divided_by: 10.0 }}rem;" {{ block.shopify_attributes }}>
 
-        {% if section.settings.show_subtitle %}
-          <p class="product-subtitle">{{ section.settings.subtitle }}</p>
-        {% endif %}
+            {%- case block.type -%}
 
-        {% assign features = section.blocks | where: 'type', 'feature' %}
-        {% if features.size > 0 %}
-          <ul class="product-features">
-            {% for block in features %}
-              <li class="product-feature" {{ block.shopify_attributes }}>
-                <svg class="feature-check" xmlns="http://www.w3.org/2000/svg" fill="var(--color-accent)" viewBox="0 0 256 256" width="20" height="20"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
-                <span>{{ block.settings.text }}</span>
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+              {%- when 'title' -%}
+                <h1 class="{{ block.settings.heading_size }}" style="{% if block.settings.uppercase %}text-transform: uppercase;{% endif %} text-align: {{ block.settings.alignment }};">
+                  {{ product.title }}
+                </h1>
 
-        {% if section.settings.show_rating %}
-          <div class="product-rating">
-            <div class="stars">
-              {% for i in (1..5) %}
-                {% if i <= section.settings.rating %}
-                  ★
-                {% else %}
-                  ☆
-                {% endif %}
-              {% endfor %}
-            </div>
-            <span class="rating-count">({{ section.settings.review_count }} değerlendirme)</span>
-          </div>
-        {% endif %}
-
-        <div class="product-price">
-          <span id="ProductPrice">{{ current_variant.price | money }}</span>
-          {% if current_variant.compare_at_price > current_variant.price %}
-            <span class="compare-price">{{ current_variant.compare_at_price | money }}</span>
-          {% endif %}
-        </div>
-
-        <!-- Variant Selector -->
-        {% if product.has_only_default_variant == false %}
-          <div class="variant-selector" id="VariantSelector">
-            {% for variant in product.variants %}
-              <label class="variant-option{% if variant == current_variant %} selected{% endif %}" data-variant-id="{{ variant.id }}">
-                <div>
-                  <span class="variant-label">{{ variant.title }}</span>
-                  {% if variant.compare_at_price > variant.price %}
-                    <br><span class="variant-save">{{ variant.compare_at_price | minus: variant.price | money }} tasarruf</span>
-                  {% endif %}
+              {%- when 'price' -%}
+                <div class="product-main__price" style="font-size: {{ block.settings.price_size | divided_by: 10.0 }}rem; font-weight: {{ block.settings.price_weight }}; text-align: {{ block.settings.alignment }};">
+                  {% render 'price', product: product, use_variant: true, show_badges: block.settings.show_badges %}
                 </div>
-                <span class="variant-price">{{ variant.price | money }}</span>
-              </label>
-            {% endfor %}
-          </div>
-        {% endif %}
 
-        <form method="post" action="/cart/add">
-          <input type="hidden" name="id" value="{{ current_variant.id }}" id="VariantId">
-          <button type="submit" class="btn btn-primary add-to-cart">
-            {{ section.settings.add_to_cart_text }}
-          </button>
-        </form>
+              {%- when 'rating_stars' -%}
+                <div style="text-align: {{ block.settings.alignment }};">
+                  {% render 'rating-stars',
+                    rating: block.settings.rating,
+                    size: block.settings.star_size,
+                    color: block.settings.star_color,
+                    show_count: block.settings.show_count,
+                    count: block.settings.review_count,
+                    count_text: block.settings.count_text
+                  %}
+                </div>
 
-        {% if section.settings.show_buy_now %}
-          <button class="buy-now" onclick="window.location.href='/checkout'">
-            {{ section.settings.buy_now_text }}
-          </button>
-        {% endif %}
+              {%- when 'text' -%}
+                <div class="product-main__text rte" style="font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem; color: {{ block.settings.text_color }}; text-align: {{ block.settings.alignment }}; line-height: 1.7;">
+                  {%- if block.settings.icon_image != blank -%}
+                    <img src="{{ block.settings.icon_image | image_url: width: 48 }}" alt="" style="width: {{ block.settings.icon_size }}px; height: {{ block.settings.icon_size }}px; display: inline-block; vertical-align: middle; margin-right: 0.8rem;" loading="lazy">
+                  {%- endif -%}
+                  {{ block.settings.text }}
+                </div>
 
-        {% if section.settings.show_trust_badges %}
-          <div class="trust-badges">
-            {% for block in section.blocks %}
-              {% if block.type == 'trust_badge' %}
-                <div class="trust-badge">
-                  <span class="trust-badge-icon">{{ block.settings.icon }}</span>
+              {%- when 'feature' -%}
+                <div class="product-main__feature flex items-center" style="gap: 1rem; font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem; font-weight: {{ block.settings.font_weight }};">
+                  {%- if block.settings.custom_icon != blank -%}
+                    <img src="{{ block.settings.custom_icon | image_url: width: 48 }}" alt="" style="width: {{ block.settings.icon_size }}px; height: {{ block.settings.icon_size }}px;" loading="lazy">
+                  {%- else -%}
+                    <span style="color: rgb(var(--color-accent-1)); flex-shrink: 0;">{% render 'icon-checkmark' %}</span>
+                  {%- endif -%}
+                  <span>{{ block.settings.text }}</span>
+                </div>
+
+              {%- when 'variant_picker' -%}
+                {% render 'product-variant-picker',
+                  product: product,
+                  block: block,
+                  picker_type: block.settings.picker_type,
+                  section_id: section.id
+                %}
+
+              {%- when 'buy_buttons' -%}
+                <div class="product-main__buy-buttons">
+                  <form method="post" action="/cart/add" id="product-form-{{ section.id }}">
+                    <input type="hidden" name="id" value="{{ current_variant.id }}" id="variant-id-{{ section.id }}">
+
+                    {%- if block.settings.show_quantity -%}
+                      <div class="quantity-selector" style="margin-bottom: 1.2rem;">
+                        <button type="button" class="quantity-selector__btn" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.dispatchEvent(new Event('change'));">{% render 'icon-minus' %}</button>
+                        <input type="number" class="quantity-selector__input" name="quantity" value="1" min="1" max="{{ current_variant.inventory_quantity | default: 99 }}">
+                        <button type="button" class="quantity-selector__btn" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.dispatchEvent(new Event('change'));">{% render 'icon-plus' %}</button>
+                      </div>
+                    {%- endif -%}
+
+                    <button
+                      type="submit"
+                      name="add"
+                      class="btn btn--primary btn--full-width"
+                      style="padding: {{ block.settings.button_padding }}px 2.8rem; font-size: {{ block.settings.button_font_size | divided_by: 10.0 }}rem;"
+                      {% unless current_variant.available %}disabled{% endunless %}
+                    >
+                      {%- if current_variant.available -%}
+                        {{ block.settings.add_to_cart_text | default: 'products.product.add_to_cart' | t }}
+                      {%- else -%}
+                        {{ 'products.product.sold_out' | t }}
+                      {%- endif -%}
+                    </button>
+                  </form>
+
+                  {%- if block.settings.show_buy_now -%}
+                    <button class="btn btn--secondary btn--full-width" style="margin-top: 0.8rem; padding: {{ block.settings.button_padding | minus: 2 }}px 2.8rem;" onclick="window.location.href='/checkout'">
+                      {{ block.settings.buy_now_text | default: 'products.product.buy_now' | t }}
+                    </button>
+                  {%- endif -%}
+                </div>
+
+              {%- when 'description' -%}
+                {%- if product.description != blank -%}
+                  <div class="product-main__description rte" style="font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem; line-height: var(--font-body-line-height);">
+                    {{ product.description }}
+                  </div>
+                {%- endif -%}
+
+              {%- when 'trust_badge' -%}
+                <div class="product-main__trust-badge flex items-center" style="gap: 0.8rem; font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem;">
+                  {%- if block.settings.icon_image != blank -%}
+                    <img src="{{ block.settings.icon_image | image_url: width: 64 }}" alt="" style="width: {{ block.settings.icon_size }}px; height: {{ block.settings.icon_size }}px;" loading="lazy">
+                  {%- endif -%}
                   <span>{{ block.settings.label }}</span>
                 </div>
-              {% endif %}
-            {% endfor %}
+
+              {%- when 'share' -%}
+                <div style="text-align: {{ block.settings.alignment }};">
+                  <button class="btn btn--tertiary" style="font-size: 1.3rem;" onclick="navigator.share ? navigator.share({title: '{{ product.title | escape }}', url: '{{ product.url | prepend: request.origin }}'}) : navigator.clipboard.writeText('{{ product.url | prepend: request.origin }}')">
+                    {% render 'icon-share' %}
+                    <span>{{ 'products.product.share' | t }}</span>
+                  </button>
+                </div>
+
+              {%- when 'sku' -%}
+                {%- if current_variant.sku != blank -%}
+                  <div class="text-muted" style="font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem;">
+                    {{ 'products.product.sku' | t }}: {{ current_variant.sku }}
+                  </div>
+                {%- endif -%}
+
+              {%- when 'inventory' -%}
+                {%- if current_variant.inventory_management == 'shopify' -%}
+                  <div style="font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem;">
+                    {%- if current_variant.inventory_quantity > 0 and current_variant.inventory_quantity <= block.settings.low_inventory_threshold -%}
+                      <span style="color: #e65100;">{{ block.settings.low_stock_text | replace: '[count]', current_variant.inventory_quantity }}</span>
+                    {%- elsif current_variant.inventory_quantity > block.settings.low_inventory_threshold -%}
+                      <span style="color: #4CAF50;">{{ block.settings.in_stock_text }}</span>
+                    {%- else -%}
+                      <span class="text-muted">{{ 'products.product.sold_out' | t }}</span>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+
+              {%- when 'collapsible_tab' -%}
+                <div class="faq-item" data-accordion-item style="border-bottom: 1px solid rgba(var(--color-foreground), 0.1);">
+                  <button class="faq-question" data-accordion-trigger style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 1.6rem 0; background: none; border: none; color: inherit; font-size: {{ block.settings.heading_size | divided_by: 10.0 }}rem; font-weight: 600; text-align: left; cursor: pointer;">
+                    <span>
+                      {%- if block.settings.icon_image != blank -%}
+                        <img src="{{ block.settings.icon_image | image_url: width: 40 }}" alt="" style="width: 2rem; height: 2rem; display: inline-block; vertical-align: middle; margin-right: 0.8rem;" loading="lazy">
+                      {%- endif -%}
+                      {{ block.settings.heading }}
+                    </span>
+                    <span class="faq-icon" style="color: rgb(var(--color-accent-1));">{% render 'icon-plus' %}</span>
+                  </button>
+                  <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 250ms ease;">
+                    <div class="faq-answer-inner rte" style="padding: 0 0 1.6rem; font-size: 1.4rem; line-height: 1.7; color: rgba(var(--color-foreground), 0.6);">
+                      {{ block.settings.content }}
+                    </div>
+                  </div>
+                </div>
+
+              {%- when 'divider' -%}
+                <hr style="border: none; border-top: {{ block.settings.thickness }}px {{ block.settings.style }} rgba(var(--color-foreground), {{ block.settings.opacity | divided_by: 100.0 }});">
+
+              {%- when 'image' -%}
+                {%- if block.settings.image != blank -%}
+                  <div style="text-align: {{ block.settings.alignment }};">
+                    <img
+                      src="{{ block.settings.image | image_url: width: 800 }}"
+                      alt="{{ block.settings.image.alt | escape }}"
+                      style="max-width: {{ block.settings.max_width }}%; border-radius: var(--media-radius);"
+                      loading="lazy"
+                    >
+                  </div>
+                {%- endif -%}
+
+              {%- when 'video' -%}
+                {%- if block.settings.video_url != blank -%}
+                  <div class="media" style="aspect-ratio: 16/9;">
+                    <iframe
+                      src="{{ block.settings.video_url }}"
+                      style="width: 100%; height: 100%; border: none; border-radius: var(--media-radius);"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                {%- endif -%}
+
+              {%- when 'payment_badges' -%}
+                <div style="text-align: {{ block.settings.alignment }};">
+                  {%- if block.settings.heading != blank -%}
+                    <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 0.8rem;">{{ block.settings.heading }}</p>
+                  {%- endif -%}
+                  <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: {{ block.settings.alignment }};">
+                    {{ shop.enabled_payment_types | payment_type_svg_tag }}
+                  </div>
+                </div>
+
+              {%- when 'urgency' -%}
+                <div style="background: rgba(var(--color-accent-1), 0.1); border: 1px solid rgba(var(--color-accent-1), 0.2); border-radius: var(--buttons-radius); padding: 1.2rem 1.6rem; font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem; text-align: center;">
+                  {{ block.settings.text }}
+                </div>
+
+              {%- when 'custom_liquid' -%}
+                {{ block.settings.liquid }}
+
+              {%- when 'emoji_benefits' -%}
+                <div class="rte" style="font-size: {{ block.settings.text_size | divided_by: 10.0 }}rem; line-height: 2;">
+                  {{ block.settings.text }}
+                </div>
+
+            {%- endcase -%}
           </div>
-        {% endif %}
+        {%- endfor -%}
       </div>
     </div>
   </div>
 </section>
 
 <script>
-  document.querySelectorAll('.variant-option').forEach(function(el) {
-    el.addEventListener('click', function() {
-      document.querySelectorAll('.variant-option').forEach(function(o) { o.classList.remove('selected'); });
-      this.classList.add('selected');
-      document.getElementById('VariantId').value = this.dataset.variantId;
+  /* Thumbnail image switching */
+  document.querySelectorAll('.product-main__thumbnail').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var mainImg = this.closest('.product-main__media').querySelector('.product-main__featured-media img');
+      var thumbImg = this.querySelector('img');
+      if (mainImg && thumbImg) {
+        mainImg.src = thumbImg.src.replace('200x', '1000x').replace('width=200', 'width=1000');
+      }
+      this.closest('.product-main__thumbnails').querySelectorAll('.product-main__thumbnail').forEach(function(t) {
+        t.style.borderColor = 'transparent';
+        t.classList.remove('product-main__thumbnail--active');
+      });
+      this.style.borderColor = 'rgb(var(--color-accent-1))';
+      this.classList.add('product-main__thumbnail--active');
     });
   });
 </script>
@@ -132,66 +286,377 @@
 {% schema %}
 {
   "name": "Ürün Detay",
+  "tag": "section",
+  "class": "section",
   "settings": [
     {
-      "type": "checkbox",
-      "id": "show_subtitle",
-      "label": "Alt Başlık Göster",
-      "default": true
-    },
-    {
-      "type": "textarea",
-      "id": "subtitle",
-      "label": "Alt Başlık",
-      "default": "Doğal deniz tuzu ile saçlarınıza hacim ve doku kazandırın. Plaj dalgası efekti için ideal."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_rating",
-      "label": "Puan Göster",
-      "default": true
+      "type": "header",
+      "content": "Düzen"
     },
     {
       "type": "range",
-      "id": "rating",
-      "label": "Yıldız Puanı",
-      "min": 1,
-      "max": 5,
-      "step": 1,
-      "default": 5
+      "id": "media_width",
+      "min": 30,
+      "max": 65,
+      "step": 5,
+      "default": 50,
+      "unit": "%",
+      "label": "Medya sütun genişliği"
     },
     {
-      "type": "text",
-      "id": "review_count",
-      "label": "Değerlendirme Sayısı",
-      "default": "2,847"
-    },
-    {
-      "type": "text",
-      "id": "add_to_cart_text",
-      "label": "Sepete Ekle Butonu",
-      "default": "SEPETE EKLE"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_buy_now",
-      "label": "Hemen Al Butonu Göster",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "buy_now_text",
-      "label": "Hemen Al Butonu Metni",
-      "default": "HEMEN SATIN AL"
+      "type": "range",
+      "id": "grid_gap",
+      "min": 16,
+      "max": 64,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "label": "Sütunlar arası boşluk"
     },
     {
       "type": "checkbox",
-      "id": "show_trust_badges",
-      "label": "Güven Rozetleri Göster",
-      "default": true
+      "id": "enable_sticky_media",
+      "default": true,
+      "label": "Yapışkan medya galerisi"
+    },
+    {
+      "type": "header",
+      "content": "Küçük resimler"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_size",
+      "min": 48,
+      "max": 120,
+      "step": 8,
+      "default": 72,
+      "unit": "px",
+      "label": "Küçük resim boyutu"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_gap",
+      "min": 4,
+      "max": 16,
+      "step": 2,
+      "default": 8,
+      "unit": "px",
+      "label": "Küçük resim aralığı"
+    },
+    {
+      "type": "header",
+      "content": "Renk"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "background-1",
+      "options": [
+        { "value": "accent-1", "label": "Vurgu 1" },
+        { "value": "accent-2", "label": "Vurgu 2" },
+        { "value": "background-1", "label": "Arka plan 1" },
+        { "value": "background-2", "label": "Arka plan 2" },
+        { "value": "inverse", "label": "Ters" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Boşluk"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "label": "Üst dolgu"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "label": "Alt dolgu"
     }
   ],
   "blocks": [
+    {
+      "type": "title",
+      "name": "Başlık",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Başlık boyutu",
+          "default": "h1",
+          "options": [
+            { "value": "h0", "label": "Çok Büyük" },
+            { "value": "h1", "label": "Büyük" },
+            { "value": "h2", "label": "Orta" },
+            { "value": "h3", "label": "Küçük" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "default": false,
+          "label": "Büyük harf"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "name": "Fiyat",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "price_size",
+          "min": 16,
+          "max": 40,
+          "step": 2,
+          "default": 28,
+          "unit": "px",
+          "label": "Fiyat boyutu"
+        },
+        {
+          "type": "range",
+          "id": "price_weight",
+          "min": 400,
+          "max": 900,
+          "step": 100,
+          "default": 800,
+          "label": "Fiyat kalınlığı"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badges",
+          "default": true,
+          "label": "İndirim/tükenmiş rozeti göster"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "rating_stars",
+      "name": "Yıldız Puanı",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5,
+          "label": "Puan"
+        },
+        {
+          "type": "select",
+          "id": "star_size",
+          "label": "Yıldız boyutu",
+          "default": "md",
+          "options": [
+            { "value": "sm", "label": "Küçük" },
+            { "value": "md", "label": "Orta" },
+            { "value": "lg", "label": "Büyük" }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "star_color",
+          "label": "Yıldız rengi",
+          "default": "#D4A843"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_count",
+          "default": true,
+          "label": "Değerlendirme sayısı göster"
+        },
+        {
+          "type": "text",
+          "id": "review_count",
+          "label": "Değerlendirme sayısı",
+          "default": "2.847"
+        },
+        {
+          "type": "text",
+          "id": "count_text",
+          "label": "Sayı sonrası metin",
+          "default": "değerlendirme"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Metin ve İkon",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Metin",
+          "default": "<p>Ürün hakkında bilgi ekleyin.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "İkon görseli (isteğe bağlı)"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "min": 16,
+          "max": 48,
+          "step": 4,
+          "default": 24,
+          "unit": "px",
+          "label": "İkon boyutu"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 11,
+          "max": 20,
+          "step": 1,
+          "default": 14,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Metin rengi",
+          "default": "#999999"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
     {
       "type": "feature",
       "name": "Ürün Özelliği",
@@ -199,8 +664,208 @@
         {
           "type": "text",
           "id": "text",
-          "label": "Özellik Metni",
+          "label": "Özellik metni",
           "default": "Anında Plaj Dalgası & Dokulu Görünüm"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Özel ikon (isteğe bağlı)",
+          "info": "Boş bırakılırsa onay ikonu kullanılır"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "min": 16,
+          "max": 32,
+          "step": 2,
+          "default": 20,
+          "unit": "px",
+          "label": "İkon boyutu"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 12,
+          "max": 18,
+          "step": 1,
+          "default": 14,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "font_weight",
+          "min": 400,
+          "max": 700,
+          "step": 100,
+          "default": 500,
+          "label": "Yazı kalınlığı"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "variant_picker",
+      "name": "Varyant Seçici",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "label": "Seçici tipi",
+          "default": "pills",
+          "options": [
+            { "value": "pills", "label": "Düğmeler" },
+            { "value": "dropdown", "label": "Açılır menü" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Satın Al Düğmeleri",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "add_to_cart_text",
+          "label": "Sepete ekle metni",
+          "default": "SEPETE EKLE"
+        },
+        {
+          "type": "range",
+          "id": "button_padding",
+          "min": 10,
+          "max": 24,
+          "step": 2,
+          "default": 16,
+          "unit": "px",
+          "label": "Düğme dolgusu"
+        },
+        {
+          "type": "range",
+          "id": "button_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "default": 15,
+          "unit": "px",
+          "label": "Düğme yazı boyutu"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_quantity",
+          "default": false,
+          "label": "Miktar seçici göster"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_buy_now",
+          "default": true,
+          "label": "Hemen satın al düğmesi göster"
+        },
+        {
+          "type": "text",
+          "id": "buy_now_text",
+          "label": "Hemen satın al metni",
+          "default": "HEMEN SATIN AL"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Açıklama",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 12,
+          "max": 18,
+          "step": 1,
+          "default": 14,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
         }
       ]
     },
@@ -209,16 +874,542 @@
       "name": "Güven Rozeti",
       "settings": [
         {
-          "type": "text",
-          "id": "icon",
-          "label": "İkon (Emoji)",
-          "default": "🚚"
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "İkon görseli (SVG/PNG/JPG)"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "min": 16,
+          "max": 48,
+          "step": 4,
+          "default": 24,
+          "unit": "px",
+          "label": "İkon boyutu"
         },
         {
           "type": "text",
           "id": "label",
           "label": "Etiket",
           "default": "Ücretsiz Kargo"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 10,
+          "max": 16,
+          "step": 1,
+          "default": 12,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "Paylaş",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 10,
+          "max": 16,
+          "step": 1,
+          "default": 12,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "inventory",
+      "name": "Stok Durumu",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "low_inventory_threshold",
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "default": 5,
+          "label": "Düşük stok eşiği"
+        },
+        {
+          "type": "text",
+          "id": "in_stock_text",
+          "label": "Stokta metni",
+          "default": "Stokta"
+        },
+        {
+          "type": "text",
+          "id": "low_stock_text",
+          "label": "Düşük stok metni",
+          "default": "Sadece [count] adet kaldı!",
+          "info": "[count] kalan adet ile değiştirilir"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 11,
+          "max": 16,
+          "step": 1,
+          "default": 13,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 4,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "collapsible_tab",
+      "name": "Açılır Sekme",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Başlık",
+          "default": "Detaylar"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "İçerik",
+          "default": "<p>Ürün detayları burada görünecek.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Başlık ikonu (isteğe bağlı)"
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "min": 13,
+          "max": 20,
+          "step": 1,
+          "default": 15,
+          "unit": "px",
+          "label": "Başlık boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Ayırıcı",
+      "settings": [
+        {
+          "type": "range",
+          "id": "thickness",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 1,
+          "unit": "px",
+          "label": "Kalınlık"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Stil",
+          "default": "solid",
+          "options": [
+            { "value": "solid", "label": "Düz" },
+            { "value": "dashed", "label": "Kesikli" },
+            { "value": "dotted", "label": "Noktalı" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "opacity",
+          "min": 5,
+          "max": 100,
+          "step": 5,
+          "default": 10,
+          "unit": "%",
+          "label": "Opaklık"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Görsel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Görsel"
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "default": 100,
+          "unit": "%",
+          "label": "Maksimum genişlik"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" },
+            { "value": "right", "label": "Sağ" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL",
+          "info": "YouTube veya Vimeo embed URL"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "payment_badges",
+      "name": "Ödeme Rozetleri",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Başlık",
+          "default": "Güvenli ödeme"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Hizalama",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Sol" },
+            { "value": "center", "label": "Orta" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "urgency",
+      "name": "Aciliyet Metni",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Metin",
+          "default": "🔥 Son 24 saatte 47 kişi bu ürünü satın aldı"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 11,
+          "max": 16,
+          "step": 1,
+          "default": 13,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Özel Liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "liquid",
+          "label": "Liquid kodu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Alt boşluk"
+        }
+      ]
+    },
+    {
+      "type": "emoji_benefits",
+      "name": "Emoji Özellikler",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Özellikler",
+          "default": "<p>🌊 Plaj dalgası efekti<br>🌿 Doğal içerikler<br>💪 Güçlü tutuş<br>✨ Mat görünüm</p>"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 12,
+          "max": 18,
+          "step": 1,
+          "default": 14,
+          "unit": "px",
+          "label": "Yazı boyutu"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Üst boşluk"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "default": 8,
+          "unit": "px",
+          "label": "Alt boşluk"
         }
       ]
     }
