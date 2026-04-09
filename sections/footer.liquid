@@ -1,0 +1,116 @@
+<footer class="site-footer">
+  <div class="footer-grid">
+    {% for block in section.blocks %}
+      {% if block.type == 'column' %}
+        <div class="footer-col" {{ block.shopify_attributes }}>
+          <h4 class="footer-col-title">{{ block.settings.title }}</h4>
+          <ul class="footer-links">
+            {% if block.settings.link_1_label != blank %}
+              <li><a href="{{ block.settings.link_1_url }}">{{ block.settings.link_1_label }}</a></li>
+            {% endif %}
+            {% if block.settings.link_2_label != blank %}
+              <li><a href="{{ block.settings.link_2_url }}">{{ block.settings.link_2_label }}</a></li>
+            {% endif %}
+            {% if block.settings.link_3_label != blank %}
+              <li><a href="{{ block.settings.link_3_url }}">{{ block.settings.link_3_label }}</a></li>
+            {% endif %}
+            {% if block.settings.link_4_label != blank %}
+              <li><a href="{{ block.settings.link_4_url }}">{{ block.settings.link_4_label }}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="footer-bottom">
+    <span>{{ section.settings.copyright }}</span>
+    <span>{{ section.settings.powered_by }}</span>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Alt Bilgi",
+  "settings": [
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Telif Hakkı",
+      "default": "© 2026 BASED. Tüm hakları saklıdır."
+    },
+    {
+      "type": "text",
+      "id": "powered_by",
+      "label": "Alt Metin",
+      "default": "Shopify ile güçlendirilmiştir"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Sütun",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Sütun Başlığı",
+          "default": "Mağaza"
+        },
+        {
+          "type": "text",
+          "id": "link_1_label",
+          "label": "Bağlantı 1 Etiketi",
+          "default": "Tüm Ürünler"
+        },
+        {
+          "type": "url",
+          "id": "link_1_url",
+          "label": "Bağlantı 1 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_2_label",
+          "label": "Bağlantı 2 Etiketi"
+        },
+        {
+          "type": "url",
+          "id": "link_2_url",
+          "label": "Bağlantı 2 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_3_label",
+          "label": "Bağlantı 3 Etiketi"
+        },
+        {
+          "type": "url",
+          "id": "link_3_url",
+          "label": "Bağlantı 3 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_4_label",
+          "label": "Bağlantı 4 Etiketi"
+        },
+        {
+          "type": "url",
+          "id": "link_4_url",
+          "label": "Bağlantı 4 URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Alt Bilgi",
+      "blocks": [
+        { "type": "column", "settings": { "title": "MAĞAZA", "link_1_label": "Tüm Ürünler", "link_2_label": "Saç Bakım", "link_3_label": "Cilt Bakım", "link_4_label": "Vücut Bakım" } },
+        { "type": "column", "settings": { "title": "BİLGİ", "link_1_label": "Hakkımızda", "link_2_label": "İletişim", "link_3_label": "Blog" } },
+        { "type": "column", "settings": { "title": "YARDIM", "link_1_label": "Kargo Bilgileri", "link_2_label": "İade Politikası", "link_3_label": "Gizlilik Politikası", "link_4_label": "KVKK" } },
+        { "type": "column", "settings": { "title": "TAKİP ET", "link_1_label": "Instagram", "link_2_label": "Twitter", "link_3_label": "YouTube" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

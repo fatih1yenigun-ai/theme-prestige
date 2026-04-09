@@ -1,0 +1,72 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">{{ section.settings.logo_text }}</a>
+
+    <nav class="header-nav">
+      {% for block in section.blocks %}
+        {% if block.type == 'nav_link' %}
+          <a href="{{ block.settings.link }}">{{ block.settings.label }}</a>
+        {% endif %}
+      {% endfor %}
+    </nav>
+
+    <div class="header-icons">
+      <a href="/search" class="header-icon" aria-label="Ara">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </a>
+      <a href="/account" class="header-icon" aria-label="Hesap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/cart" class="header-icon" aria-label="Sepet">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </a>
+      <button class="menu-toggle" aria-label="Menü">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Üst Menü",
+  "settings": [
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Metni",
+      "default": "BASED"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo Görseli"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Menü Bağlantısı",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiket",
+          "default": "Ürünler"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Bağlantı",
+          "default": "/collections/all"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Üst Menü"
+    }
+  ]
+}
+{% endschema %}

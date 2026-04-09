@@ -1,0 +1,140 @@
+{%- assign total_reviews = 0 -%}
+{%- assign total_rating = 0 -%}
+{%- for block in section.blocks -%}
+  {%- if block.type == 'review' -%}
+    {%- assign total_reviews = total_reviews | plus: 1 -%}
+    {%- assign total_rating = total_rating | plus: block.settings.rating -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<section class="reviews-section" style="background: {{ section.settings.bg_color }};">
+  <div class="container">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+
+    {% if section.settings.show_summary and total_reviews > 0 %}
+      {%- assign avg_rating_x10 = total_rating | times: 10 | divided_by: total_reviews -%}
+      {%- assign avg_whole = avg_rating_x10 | divided_by: 10 -%}
+      {%- assign avg_decimal = avg_rating_x10 | modulo: 10 -%}
+      <div class="reviews-summary">
+        <div class="reviews-avg">{{ avg_whole }}.{{ avg_decimal }}</div>
+        <div class="stars" style="justify-content: center; font-size: 20px;">
+          {% for i in (1..5) %}
+            {% if i <= avg_whole %}★{% else %}☆{% endif %}
+          {% endfor %}
+        </div>
+        <div class="reviews-total">{{ total_reviews }} değerlendirme</div>
+      </div>
+    {% endif %}
+
+    <div class="reviews-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'review' %}
+          <div class="review-card" {{ block.shopify_attributes }}>
+            <div class="review-stars">
+              {% for i in (1..5) %}
+                {% if i <= block.settings.rating %}★{% else %}☆{% endif %}
+              {% endfor %}
+            </div>
+            {% if block.settings.title != blank %}
+              <div class="review-title">{{ block.settings.title }}</div>
+            {% endif %}
+            <div class="review-body">{{ block.settings.body }}</div>
+            <div class="review-author">
+              {{ block.settings.author }}
+              {% if block.settings.date != blank %}
+                · {{ block.settings.date }}
+              {% endif %}
+              {% if block.settings.verified %}
+                <span class="review-verified">✓ Doğrulanmış Alıcı</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Ürün Değerlendirmeleri",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Müşteri Değerlendirmeleri"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_summary",
+      "label": "Özet Göster",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Arka Plan Rengi",
+      "default": "#0a0a0a"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Değerlendirme",
+      "limit": 50,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Puan",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Başlık",
+          "default": "Harika ürün!"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Yorum",
+          "default": "Saçlarıma harika bir doku ve hacim veriyor. Kesinlikle tavsiye ederim."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Yazar",
+          "default": "Ahmet K."
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Tarih",
+          "default": "15 Mart 2026"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Doğrulanmış Alıcı",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ürün Değerlendirmeleri",
+      "blocks": [
+        { "type": "review", "settings": { "rating": 5, "title": "Tam aradığım ürün!", "body": "Deniz tuzu spreyi saçlarıma harika bir doku veriyor. Mat ve doğal bir görünüm sağlıyor, kesinlikle tavsiye ederim.", "author": "Ahmet K.", "date": "15 Mart 2026", "verified": true } },
+        { "type": "review", "settings": { "rating": 5, "title": "Mükemmel hacim", "body": "İnce saçlarım için ideal. Saçlarıma inanılmaz hacim katıyor ve gün boyu kalıcı oluyor.", "author": "Mehmet Y.", "date": "10 Mart 2026", "verified": true } },
+        { "type": "review", "settings": { "rating": 4, "title": "Çok iyi", "body": "Kokusu harika, saçta güzel bir doku bırakıyor. Biraz daha fazla tutuculuk olsa 5 yıldız verirdim.", "author": "Burak S.", "date": "5 Mart 2026", "verified": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

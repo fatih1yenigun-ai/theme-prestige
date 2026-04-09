@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "social-proof": {
+      "type": "social-proof",
+      "settings": {
+        "number": "3.000.000+",
+        "label": "Mutlu Müşteri"
+      }
+    }
+  },
+  "order": ["social-proof"]
+}

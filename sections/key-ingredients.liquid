@@ -1,0 +1,73 @@
+<section class="ingredients-section" style="background: {{ section.settings.bg_color }};">
+  <div class="container">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+    <div class="ingredients-grid">
+      {% for block in section.blocks %}
+        <div class="ingredient-card" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            <img
+              class="ingredient-image"
+              src="{{ block.settings.image | image_url: width: 400 }}"
+              alt="{{ block.settings.name | escape }}"
+              width="400"
+              height="250"
+              loading="lazy"
+            >
+          {% else %}
+            <div class="ingredient-image" style="background: var(--color-bg-floating);"></div>
+          {% endif %}
+          <div class="ingredient-name">{{ block.settings.name }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Temel İçerikler",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Temel İçerikler"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Arka Plan Rengi",
+      "default": "#141414"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ingredient",
+      "name": "İçerik",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Görsel"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "İçerik Adı",
+          "default": "Deniz Tuzu"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Temel İçerikler",
+      "blocks": [
+        { "type": "ingredient", "settings": { "name": "Deniz Tuzu" } },
+        { "type": "ingredient", "settings": { "name": "Argan Yağı" } },
+        { "type": "ingredient", "settings": { "name": "Keratin" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

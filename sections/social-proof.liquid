@@ -1,0 +1,67 @@
+<section class="social-proof" style="background: {{ section.settings.bg_color }};">
+  <div class="container">
+    <div class="social-proof-number">{{ section.settings.number }}</div>
+    <div class="social-proof-label">{{ section.settings.label }}</div>
+
+    {% if section.blocks.size > 0 %}
+      <div class="social-proof-features">
+        {% for block in section.blocks %}
+          <div class="social-proof-feature" {{ block.shopify_attributes }}>
+            <span class="checkmark">✓</span>
+            <span>{{ block.settings.text }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Sosyal Kanıt",
+  "settings": [
+    {
+      "type": "text",
+      "id": "number",
+      "label": "Büyük Sayı",
+      "default": "3.000.000+"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Alt Metin",
+      "default": "Mutlu Müşteri"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Arka Plan Rengi",
+      "default": "#0a0a0a"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Özellik",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Metin",
+          "default": "%100 Doğal İçerik"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sosyal Kanıt",
+      "blocks": [
+        { "type": "feature", "settings": { "text": "%100 Doğal İçerik" } },
+        { "type": "feature", "settings": { "text": "Sülfat & Paraben İçermez" } },
+        { "type": "feature", "settings": { "text": "Türkiye'de Üretilmiştir" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

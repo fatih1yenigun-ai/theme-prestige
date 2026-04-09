@@ -1,0 +1,21 @@
+{
+  "type": "footer",
+  "name": "Alt Grup",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "copyright": "© 2026 BASED. Tüm hakları saklıdır.",
+        "powered_by": "Shopify ile güçlendirilmiştir"
+      },
+      "blocks": {
+        "col-1": { "type": "column", "settings": { "title": "MAĞAZA", "link_1_label": "Tüm Ürünler", "link_2_label": "Saç Bakım", "link_3_label": "Cilt Bakım", "link_4_label": "Vücut Bakım" } },
+        "col-2": { "type": "column", "settings": { "title": "BİLGİ", "link_1_label": "Hakkımızda", "link_2_label": "İletişim", "link_3_label": "Blog" } },
+        "col-3": { "type": "column", "settings": { "title": "YARDIM", "link_1_label": "Kargo Bilgileri", "link_2_label": "İade Politikası", "link_3_label": "Gizlilik Politikası", "link_4_label": "KVKK" } },
+        "col-4": { "type": "column", "settings": { "title": "TAKİP ET", "link_1_label": "Instagram", "link_2_label": "Twitter", "link_3_label": "YouTube" } }
+      },
+      "block_order": ["col-1", "col-2", "col-3", "col-4"]
+    }
+  },
+  "order": ["footer"]
+}

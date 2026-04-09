@@ -1,0 +1,33 @@
+<div class="announcement-bar">
+  <p>
+    {% if section.settings.link != blank %}
+      <a href="{{ section.settings.link }}">{{ section.settings.text }}</a>
+    {% else %}
+      {{ section.settings.text }}
+    {% endif %}
+  </p>
+</div>
+
+{% schema %}
+{
+  "name": "Duyuru Çubuğu",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Duyuru Metni",
+      "default": "🚚 500 TL Üzeri Ücretsiz Kargo"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Bağlantı"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Duyuru Çubuğu"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,26 @@
+{
+  "type": "header",
+  "name": "Üst Grup",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "text": "🚚 500 TL Üzeri Ücretsiz Kargo"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_text": "BASED"
+      },
+      "blocks": {
+        "nav-1": { "type": "nav_link", "settings": { "label": "Saç Bakım", "link": "/collections/hair" } },
+        "nav-2": { "type": "nav_link", "settings": { "label": "Cilt Bakım", "link": "/collections/skin" } },
+        "nav-3": { "type": "nav_link", "settings": { "label": "Vücut Bakım", "link": "/collections/body" } },
+        "nav-4": { "type": "nav_link", "settings": { "label": "Setler", "link": "/collections/sets" } }
+      },
+      "block_order": ["nav-1", "nav-2", "nav-3", "nav-4"]
+    }
+  },
+  "order": ["announcement-bar", "header"]
+}

@@ -1,0 +1,71 @@
+<section class="why-choose" style="background: {{ section.settings.bg_color }};">
+  <div class="container">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+    <div class="why-choose-grid">
+      {% for block in section.blocks %}
+        <div class="why-choose-card" {{ block.shopify_attributes }}>
+          <div class="why-choose-icon">{{ block.settings.icon }}</div>
+          <h3 class="why-choose-title">{{ block.settings.title }}</h3>
+          <p class="why-choose-desc">{{ block.settings.description }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Neden Biz?",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Neden BASED?"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Arka Plan Rengi",
+      "default": "#141414"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reason",
+      "name": "Neden",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "İkon (Emoji)",
+          "default": "🌿"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Başlık",
+          "default": "Doğal Formül"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Açıklama",
+          "default": "Zararlı kimyasallar içermeyen, doğal içeriklerle zenginleştirilmiş formül."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Neden Biz?",
+      "blocks": [
+        { "type": "reason", "settings": { "icon": "🌿", "title": "Doğal Formül", "description": "Zararlı kimyasallar içermeyen, doğal içeriklerle zenginleştirilmiş formül." } },
+        { "type": "reason", "settings": { "icon": "🧪", "title": "Bilimsel Yaklaşım", "description": "Her ürün dermatologlar tarafından test edilmiş ve onaylanmıştır." } },
+        { "type": "reason", "settings": { "icon": "♻️", "title": "Sürdürülebilir", "description": "Çevre dostu ambalaj ve sürdürülebilir üretim süreçleri." } },
+        { "type": "reason", "settings": { "icon": "🇹🇷", "title": "Yerli Üretim", "description": "Türkiye'de üretilen, uluslararası standartlarda kalite." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

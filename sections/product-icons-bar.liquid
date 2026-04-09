@@ -1,0 +1,54 @@
+<section class="icons-bar">
+  {% for block in section.blocks %}
+    <div class="icon-item" {{ block.shopify_attributes }}>
+      {% if block.settings.icon_image != blank %}
+        <img
+          src="{{ block.settings.icon_image | image_url: width: 80 }}"
+          alt="{{ block.settings.label | escape }}"
+          width="40"
+          height="40"
+          loading="lazy"
+        >
+      {% endif %}
+      <span class="icon-label">{{ block.settings.label }}</span>
+    </div>
+  {% endfor %}
+</section>
+
+{% schema %}
+{
+  "name": "Ürün İkon Çubuğu",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "icon",
+      "name": "İkon",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "İkon Görseli"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiket",
+          "default": "Doğal İçerik"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ürün İkon Çubuğu",
+      "blocks": [
+        { "type": "icon", "settings": { "label": "Doğal İçerik" } },
+        { "type": "icon", "settings": { "label": "Hızlı Kargo" } },
+        { "type": "icon", "settings": { "label": "Kolay İade" } },
+        { "type": "icon", "settings": { "label": "Güvenli Ödeme" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

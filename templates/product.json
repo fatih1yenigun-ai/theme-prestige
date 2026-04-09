@@ -1,0 +1,36 @@
+{
+  "sections": {
+    "product-main": {
+      "type": "product-main",
+      "settings": {
+        "show_subtitle": true,
+        "subtitle": "",
+        "show_rating": true,
+        "rating": 5,
+        "review_count": "0",
+        "add_to_cart_text": "SEPETE EKLE",
+        "show_buy_now": true,
+        "buy_now_text": "HEMEN SATIN AL",
+        "show_trust_badges": true
+      },
+      "blocks": {
+        "badge-1": { "type": "trust_badge", "settings": { "icon": "🚚", "label": "Ücretsiz Kargo" } },
+        "badge-2": { "type": "trust_badge", "settings": { "icon": "↩️", "label": "30 Gün İade" } },
+        "badge-3": { "type": "trust_badge", "settings": { "icon": "🔒", "label": "Güvenli Ödeme" } }
+      },
+      "block_order": ["badge-1", "badge-2", "badge-3"]
+    },
+    "product-icons-bar": {
+      "type": "product-icons-bar"
+    },
+    "product-reviews": {
+      "type": "product-reviews",
+      "settings": {
+        "heading": "Müşteri Değerlendirmeleri",
+        "show_summary": true,
+        "bg_color": "#0a0a0a"
+      }
+    }
+  },
+  "order": ["product-main", "product-icons-bar", "product-reviews"]
+}

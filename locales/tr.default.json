@@ -1,0 +1,41 @@
+{
+  "general": {
+    "search": "Ara",
+    "cart": "Sepet",
+    "account": "Hesap",
+    "menu": "Menü",
+    "close": "Kapat"
+  },
+  "products": {
+    "add_to_cart": "Sepete Ekle",
+    "buy_now": "Hemen Satın Al",
+    "sold_out": "Tükendi",
+    "quantity": "Adet",
+    "price": "Fiyat",
+    "compare_at_price": "Karşılaştırma Fiyatı",
+    "save": "Tasarruf",
+    "reviews": "Değerlendirmeler",
+    "verified_buyer": "Doğrulanmış Alıcı"
+  },
+  "collections": {
+    "title": "Koleksiyonlar",
+    "all": "Tüm Ürünler",
+    "filter": "Filtrele",
+    "sort": "Sırala"
+  },
+  "cart": {
+    "title": "Sepetiniz",
+    "empty": "Sepetiniz boş",
+    "subtotal": "Ara Toplam",
+    "checkout": "Ödemeye Geç",
+    "continue_shopping": "Alışverişe Devam Et",
+    "remove": "Kaldır"
+  },
+  "footer": {
+    "copyright": "© 2026 BASED. Tüm hakları saklıdır."
+  },
+  "accessibility": {
+    "skip_to_content": "İçeriğe Atla",
+    "close": "Kapat"
+  }
+}
